@@ -395,13 +395,194 @@ local function createMainGUI()
 	closeBtnCorner.CornerRadius = UDim.new(0, 8)
 	closeBtnCorner.Parent = closeBtn
 
+	-- Функция для создания диалогового окна подтверждения закрытия
+	local function showCloseConfirmation()
+		-- Создаем затемняющий фон
+		local overlay = Instance.new("Frame")
+		overlay.Name = "CloseConfirmationOverlay"
+		overlay.Size = UDim2.new(1, 0, 1, 0)
+		overlay.Position = UDim2.new(0, 0, 0, 0)
+		overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		overlay.BackgroundTransparency = 0.5
+		overlay.BorderSizePixel = 0
+		overlay.ZIndex = 100
+		overlay.Parent = screenGui
+
+		-- Создаем диалоговое окно
+		local dialog = Instance.new("Frame")
+		dialog.Name = "CloseConfirmationDialog"
+		dialog.Size = UDim2.new(0, 400, 0, 200)
+		dialog.Position = UDim2.new(0.5, -200, 0.5, -100)
+		dialog.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+		dialog.BorderSizePixel = 0
+		dialog.ZIndex = 101
+		dialog.Parent = overlay
+
+		-- Закругленные углы
+		local dialogCorner = Instance.new("UICorner")
+		dialogCorner.CornerRadius = UDim.new(0, 12)
+		dialogCorner.Parent = dialog
+
+		-- Заголовок
+		local titleLabel = Instance.new("TextLabel")
+		titleLabel.Name = "TitleLabel"
+		titleLabel.Size = UDim2.new(1, 0, 0, 40)
+		titleLabel.Position = UDim2.new(0, 0, 0, 0)
+		titleLabel.BackgroundTransparency = 1
+		titleLabel.Text = "Close Window"
+		titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		titleLabel.TextSize = 20
+		titleLabel.Font = Enum.Font.GothamBold
+		titleLabel.ZIndex = 102
+		titleLabel.Parent = dialog
+
+		-- Линия под заголовком
+		local line = Instance.new("Frame")
+		line.Name = "Line"
+		line.Size = UDim2.new(1, -20, 0, 1)
+		line.Position = UDim2.new(0, 10, 0, 40)
+		line.BackgroundColor3 = Color3.fromRGB(68, 68, 68)
+		line.BorderSizePixel = 0
+		line.ZIndex = 102
+		line.Parent = dialog
+
+		-- Текст вопроса
+		local questionLabel = Instance.new("TextLabel")
+		questionLabel.Name = "QuestionLabel"
+		questionLabel.Size = UDim2.new(1, -20, 0, 30)
+		questionLabel.Position = UDim2.new(0, 10, 0, 55)
+		questionLabel.BackgroundTransparency = 1
+		questionLabel.Text = "Do you want to close this window?"
+		questionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		questionLabel.TextSize = 16
+		questionLabel.Font = Enum.Font.Gotham
+		questionLabel.ZIndex = 102
+		questionLabel.Parent = dialog
+
+		-- Текст предупреждения
+		local warningLabel = Instance.new("TextLabel")
+		warningLabel.Name = "WarningLabel"
+		warningLabel.Size = UDim2.new(1, -20, 0, 30)
+		warningLabel.Position = UDim2.new(0, 10, 0, 85)
+		warningLabel.BackgroundTransparency = 1
+		warningLabel.Text = "You will not be able to open it again."
+		warningLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+		warningLabel.TextSize = 14
+		warningLabel.Font = Enum.Font.Gotham
+		warningLabel.ZIndex = 102
+		warningLabel.Parent = dialog
+
+		-- Кнопка Cancel
+		local cancelBtn = Instance.new("TextButton")
+		cancelBtn.Name = "CancelBtn"
+		cancelBtn.Size = UDim2.new(0, 170, 0, 40)
+		cancelBtn.Position = UDim2.new(0, 20, 1, -55)
+		cancelBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+		cancelBtn.BorderSizePixel = 0
+		cancelBtn.Text = "Cancel"
+		cancelBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		cancelBtn.TextSize = 16
+		cancelBtn.Font = Enum.Font.GothamBold
+		cancelBtn.ZIndex = 102
+		cancelBtn.Parent = dialog
+
+		local cancelCorner = Instance.new("UICorner")
+		cancelCorner.CornerRadius = UDim.new(0, 8)
+		cancelCorner.Parent = cancelBtn
+
+		-- Кнопка Close Window
+		local closeWindowBtn = Instance.new("TextButton")
+		closeWindowBtn.Name = "CloseWindowBtn"
+		closeWindowBtn.Size = UDim2.new(0, 170, 0, 40)
+		closeWindowBtn.Position = UDim2.new(1, -190, 1, -55)
+		closeWindowBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+		closeWindowBtn.BorderSizePixel = 0
+		closeWindowBtn.Text = "Close Window"
+		closeWindowBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		closeWindowBtn.TextSize = 16
+		closeWindowBtn.Font = Enum.Font.GothamBold
+		closeWindowBtn.ZIndex = 102
+		closeWindowBtn.Parent = dialog
+
+		local closeWindowCorner = Instance.new("UICorner")
+		closeWindowCorner.CornerRadius = UDim.new(0, 8)
+		closeWindowCorner.Parent = closeWindowBtn
+
+		-- Функция для закрытия диалога
+		local function closeDialog()
+			overlay:Destroy()
+		end
+
+		-- Обработка клика на Cancel (просто закрывает диалог)
+		cancelBtn.MouseButton1Click:Connect(function()
+			closeDialog()
+		end)
+
+		-- Обработка клика на Close Window (полностью закрывает скрипт)
+		closeWindowBtn.MouseButton1Click:Connect(function()
+			-- Закрываем диалог
+			closeDialog()
+
+			-- Закрываем главное меню
+			if mainGui then
+				isGuiVisible = false
+				mainGui:Destroy()
+				mainGui = nil
+			end
+
+			-- Удаляем иконку меню
+			local playerGui = Players.LocalPlayer:FindFirstChild("PlayerGui")
+			if playerGui then
+				local iconGui = playerGui:FindFirstChild("FishItMenuIcon")
+				if iconGui then
+					iconGui:Destroy()
+				end
+			end
+
+			-- Останавливаем все функции скрипта
+			ScriptEnabled = false
+			guiFunctions = {}
+
+			-- Останавливаем все соединения
+			if autoFishConnection then
+				autoFishConnection = nil
+			end
+
+			for weatherName, connection in pairs(weatherConnections) do
+				if connection then
+					connection:Disconnect()
+				end
+			end
+			weatherConnections = {}
+
+			if antiAFKConnection then
+				antiAFKConnection = nil
+			end
+
+			if autorejoinConnection then
+				autorejoinConnection:Disconnect()
+				autorejoinConnection = nil
+			end
+
+			if airwalkJumpConnection then
+				airwalkJumpConnection:Disconnect()
+				airwalkJumpConnection = nil
+			end
+
+			for _, connection in pairs(optimizationV2Connections) do
+				if connection then
+					connection:Disconnect()
+				end
+			end
+			optimizationV2Connections = {}
+
+			print("🛑 Скрипт полностью остановлен!")
+		end)
+	end
+
 	-- Обработка клика на кнопку закрытия
 	closeBtn.MouseButton1Click:Connect(function()
-		if mainGui then
-			isGuiVisible = false
-			mainGui.Enabled = false
-			print("Меню закрыто")
-		end
+		showCloseConfirmation()
 	end)
 
 	-- Создаем левую панель для категорий
