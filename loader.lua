@@ -348,6 +348,33 @@ local function createMainGUI()
 	title.Font = Enum.Font.GothamBold
 	title.Parent = header
 
+	-- Создаем кнопку сворачивания
+	local minimizeBtn = Instance.new("TextButton")
+	minimizeBtn.Name = "MinimizeBtn"
+	minimizeBtn.Size = UDim2.new(0, 40, 0, 40)
+	minimizeBtn.Position = UDim2.new(1, -90, 0.5, -20)
+	minimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+	minimizeBtn.BorderSizePixel = 0
+	minimizeBtn.Text = "−"
+	minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	minimizeBtn.TextSize = 24
+	minimizeBtn.Font = Enum.Font.GothamBold
+	minimizeBtn.Parent = header
+
+	-- UICorner для кнопки сворачивания
+	local minimizeBtnCorner = Instance.new("UICorner")
+	minimizeBtnCorner.CornerRadius = UDim.new(0, 8)
+	minimizeBtnCorner.Parent = minimizeBtn
+
+	-- Обработка клика на кнопку сворачивания
+	minimizeBtn.MouseButton1Click:Connect(function()
+		if mainGui then
+			isGuiVisible = false
+			mainGui.Enabled = false
+			print("Меню свернуто")
+		end
+	end)
+
 	-- Создаем кнопку закрытия
 	local closeBtn = Instance.new("TextButton")
 	closeBtn.Name = "CloseBtn"
@@ -371,6 +398,7 @@ local function createMainGUI()
 		if mainGui then
 			isGuiVisible = false
 			mainGui.Enabled = false
+			print("Меню закрыто")
 		end
 	end)
 
