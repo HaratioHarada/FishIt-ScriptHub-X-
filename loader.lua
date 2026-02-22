@@ -32,7 +32,6 @@ print("PlayerGui:", game.Players.LocalPlayer and game.Players.LocalPlayer:FindFi
 local mainGui = nil
 local isGuiVisible = false
 local guiFunctions = {}
-local espConnections = {}
 local expandedCategories = {}
 local webhookUrl = ""
 local favoriteRarities = {
@@ -1369,88 +1368,7 @@ end
 
 
 
--- Функция для включения ESP
-local function enableESP()
-	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= Players.LocalPlayer then
-			local character = player.Character
-			if character then
-				createESPBox(character, player.Name)
-			end
 
-			-- Подключаемся к появлению персонажа
-			local connection
-			connection = player.CharacterAdded:Connect(function(newCharacter)
-				createESPBox(newCharacter, player.Name)
-			end)
-			table.insert(espConnections, connection)
-		end
-	end
-end
-
--- Создаем ESP бокс для персонажа
-local function createESPBox(character, playerName)
-	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-	if not humanoidRootPart then return end
-
-	-- Создаем бокс
-	local box = Instance.new("BoxHandleAdornment")
-	box.Name = "ESPBox"
-	box.Size = Vector3.new(4, 6, 2)
-	box.Color3 = Color3.fromRGB(255, 0, 0)
-	box.Transparency = 0.5
-	box.AlwaysOnTop = true
-	box.ZIndex = 10
-	box.Adornee = humanoidRootPart
-	box.Parent = character
-
-	-- Создаем текст с именем
-	local billboard = Instance.new("BillboardGui")
-	billboard.Name = "ESPName"
-	billboard.Size = UDim2.new(0, 100, 0, 50)
-	billboard.StudsOffset = Vector3.new(0, 3, 0)
-	billboard.AlwaysOnTop = true
-	billboard.Parent = character
-
-	local textLabel = Instance.new("TextLabel")
-	textLabel.Size = UDim2.new(1, 0, 1, 0)
-	textLabel.BackgroundTransparency = 1
-	textLabel.Text = playerName
-	textLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
-	textLabel.TextStrokeTransparency = 0
-	textLabel.TextSize = 14
-	textLabel.Font = Enum.Font.GothamBold
-	textLabel.Parent = billboard
-end
-
--- Функция для отключения ESP
-local function disableESP()
-	-- Отключаем все соединения
-	for _, connection in pairs(espConnections) do
-		if connection then
-			connection:Disconnect()
-		end
-	end
-	espConnections = {}
-
-	-- Удаляем все ESP элементы
-	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= Players.LocalPlayer then
-			local character = player.Character
-			if character then
-				local espBox = character:FindFirstChild("ESPBox")
-				if espBox then
-					espBox:Destroy()
-				end
-
-				local espName = character:FindFirstChild("ESPName")
-				if espName then
-					espName:Destroy()
-				end
-			end
-		end
-	end
-end
 
 -- Обработка ввода для открытия/закрытия GUI
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
