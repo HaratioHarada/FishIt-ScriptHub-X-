@@ -449,6 +449,9 @@ local function createMainGUI()
 	-- Переменная для хранения текущей активной категории
 	local currentCategory = nil
 
+	-- Переменная для хранения callback категории Info (для автоматического открытия)
+	local infoCategoryCallback = nil
+
 	-- Функция для создания кнопки категории
 	local function createCategoryButton(name, icon, callback)
 		local btn = Instance.new("TextButton")
@@ -505,7 +508,7 @@ local function createMainGUI()
 	end
 
 	-- Функция для создания заголовка в правой панели
-	local function createRightPanelTitle(title)
+	local function createRightPanelTitle(title, panel)
 		local titleLabel = Instance.new("TextLabel")
 		titleLabel.Name = "TitleLabel"
 		titleLabel.Size = UDim2.new(1, -20, 0, 30)
@@ -516,7 +519,7 @@ local function createMainGUI()
 		titleLabel.TextSize = 18
 		titleLabel.Font = Enum.Font.GothamBold
 		titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-		titleLabel.Parent = rightPanel
+		titleLabel.Parent = panel
 
 		-- Линия под заголовком
 		local line = Instance.new("Frame")
@@ -525,19 +528,19 @@ local function createMainGUI()
 		line.Position = UDim2.new(0, 10, 0, 45)
 		line.BackgroundColor3 = Color3.fromRGB(68, 68, 68)
 		line.BorderSizePixel = 0
-		line.Parent = rightPanel
+		line.Parent = panel
 
 		return titleLabel
 	end
 
 	-- Функция для создания контейнера для элементов
-	local function createRightPanelContainer()
+	local function createRightPanelContainer(panel)
 		local container = Instance.new("Frame")
 		container.Name = "Container"
 		container.Size = UDim2.new(1, -20, 1, -60)
 		container.Position = UDim2.new(0, 10, 0, 60)
 		container.BackgroundTransparency = 1
-		container.Parent = rightPanel
+		container.Parent = panel
 
 		-- UIListLayout для контейнера
 		local layout = Instance.new("UIListLayout")
@@ -553,8 +556,8 @@ local function createMainGUI()
 
 	-- Farm категория
 	createCategoryButton("Farm", "🎣", function(rightPanel)
-		createRightPanelTitle("🎣 Farm")
-		local container = createRightPanelContainer()
+		createRightPanelTitle("🎣 Farm", rightPanel)
+		local container = createRightPanelContainer(rightPanel)
 
 		-- AutoFish
 		createToggle(container, "🐟 AutoFish", 0, function(enabled)
@@ -593,8 +596,8 @@ local function createMainGUI()
 
 	-- Teleport категория
 	createCategoryButton("Teleport", "🚀", function(rightPanel)
-		createRightPanelTitle("🚀 Teleport")
-		local container = createRightPanelContainer()
+		createRightPanelTitle("🚀 Teleport", rightPanel)
+		local container = createRightPanelContainer(rightPanel)
 
 		-- Teleport To Island
 		createButton(container, "🏝️ Teleport To Island", 0, function()
@@ -764,8 +767,8 @@ local function createMainGUI()
 
 	-- Shop категория
 	createCategoryButton("Shop", "🛒", function(rightPanel)
-		createRightPanelTitle("🛒 Shop")
-		local container = createRightPanelContainer()
+		createRightPanelTitle("🛒 Shop", rightPanel)
+		local container = createRightPanelContainer(rightPanel)
 
 		-- Open/Close Shop
 		createButton(container, "🏪 Open/Close Shop", 0, function()
@@ -903,8 +906,8 @@ local function createMainGUI()
 
 	-- AutoFavorite категория
 	createCategoryButton("AutoFavorite", "⭐", function(rightPanel)
-		createRightPanelTitle("⭐ AutoFavorite")
-		local container = createRightPanelContainer()
+		createRightPanelTitle("⭐ AutoFavorite", rightPanel)
+		local container = createRightPanelContainer(rightPanel)
 
 		-- Common
 		createToggle(container, "Common", 0, function(enabled)
@@ -953,8 +956,8 @@ local function createMainGUI()
 
 	-- Misc категория
 	createCategoryButton("Misc", "🔧", function(rightPanel)
-		createRightPanelTitle("🔧 Misc")
-		local container = createRightPanelContainer()
+		createRightPanelTitle("🔧 Misc", rightPanel)
+		local container = createRightPanelContainer(rightPanel)
 
 		-- Noclip
 		createToggle(container, "👻 Noclip", 0, function(enabled)
@@ -995,8 +998,8 @@ local function createMainGUI()
 
 	-- Webhook категория
 	createCategoryButton("Webhook", "🔔", function(rightPanel)
-		createRightPanelTitle("🔔 Webhook")
-		local container = createRightPanelContainer()
+		createRightPanelTitle("🔔 Webhook", rightPanel)
+		local container = createRightPanelContainer(rightPanel)
 
 		-- Webhook URL input
 		local webhookInput = Instance.new("TextBox")
@@ -1028,8 +1031,8 @@ local function createMainGUI()
 
 	-- Settings категория
 	createCategoryButton("Settings", "⚙️", function(rightPanel)
-		createRightPanelTitle("⚙️ Settings")
-		local container = createRightPanelContainer()
+		createRightPanelTitle("⚙️ Settings", rightPanel)
+		local container = createRightPanelContainer(rightPanel)
 
 		-- Keybind для открытия меню
 		local keybindFrame = Instance.new("Frame")
@@ -1153,24 +1156,30 @@ local function createMainGUI()
 
 	-- Info категория
 	createCategoryButton("Info", "ℹ️", function(rightPanel)
-		createRightPanelTitle("ℹ️ Info")
-		local container = createRightPanelContainer()
+		-- Сохраняем callback для автоматического открытия (с параметром rightPanel)
+		infoCategoryCallback = function(panel)
+			createRightPanelTitle("ℹ️ Info", panel)
+			local container = createRightPanelContainer(panel)
 
-		-- Информационный текст
-		local infoText = Instance.new("TextLabel")
-		infoText.Name = "InfoText"
-		infoText.Size = UDim2.new(1, 0, 0, 100)
-		infoText.BackgroundTransparency = 1
-		infoText.Text = "FishIt [ScriptHub X] - это мощный скрипт для Roblox Fish It специально разработан для того, чтобы сделать ваши рыболовные приключения в популярной игре Roblox Fish It невероятно простыми и увлекательными.\n\nНажмите G чтобы открыть/закрыть меню."
-		infoText.TextColor3 = Color3.fromRGB(255, 255, 255)
-		infoText.TextSize = 12
-		infoText.Font = Enum.Font.Gotham
-		infoText.TextXAlignment = Enum.TextXAlignment.Left
-		infoText.TextYAlignment = Enum.TextYAlignment.Top
-		infoText.TextWrapped = true
-		infoText.Parent = container
+			-- Информационный текст
+			local infoText = Instance.new("TextLabel")
+			infoText.Name = "InfoText"
+			infoText.Size = UDim2.new(1, 0, 0, 100)
+			infoText.BackgroundTransparency = 1
+			infoText.Text = "FishIt [ScriptHub X] - это мощный скрипт для Roblox Fish It специально разработан для того, чтобы сделать ваши рыболовные приключения в популярной игре Roblox Fish It невероятно простыми и увлекательными.\n\nНажмите G чтобы открыть/закрыть меню."
+			infoText.TextColor3 = Color3.fromRGB(255, 255, 255)
+			infoText.TextSize = 12
+			infoText.Font = Enum.Font.Gotham
+			infoText.TextXAlignment = Enum.TextXAlignment.Left
+			infoText.TextYAlignment = Enum.TextYAlignment.Top
+			infoText.TextWrapped = true
+			infoText.Parent = container
 
-		rightPanel.CanvasSize = UDim2.new(0, 0, 0, 120)
+			panel.CanvasSize = UDim2.new(0, 0, 0, 120)
+		end
+
+		-- Вызываем callback сразу для загрузки содержимого
+		infoCategoryCallback(rightPanel)
 	end)
 
 	print("Все категории созданы")
@@ -1414,6 +1423,54 @@ if menuIcon then
 else
 	print("⚠️ Не удалось создать иконку меню")
 end
+
+-- Автоматически открываем меню и выбираем категорию Info при запуске
+task.wait(0.5) -- Ждем небольшую задержку для полной инициализации
+print("🚀 Автоматически открываем меню...")
+toggleGUI()
+
+-- Ждем создания GUI и затем выбираем категорию Info
+task.wait(0.3)
+if mainGui then
+	local window = mainGui:FindFirstChild("MainWindow")
+	if window then
+		local leftPanel = window:FindFirstChild("LeftPanel")
+		if leftPanel then
+			-- Ищем кнопку категории Info
+			for _, child in pairs(leftPanel:GetChildren()) do
+				if child:IsA("TextButton") and child.Name == "InfoBtn" then
+					print("✅ Найдена кнопка Info, симулируем клик...")
+					-- Сбрасываем цвет всех кнопок
+					for _, btn in pairs(leftPanel:GetChildren()) do
+						if btn:IsA("TextButton") then
+							btn.BackgroundColor3 = Color3.fromRGB(51, 51, 51)
+						end
+					end
+					-- Подсвечиваем кнопку Info
+					child.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+					-- Вызываем callback для загрузки содержимого категории Info
+					if infoCategoryCallback then
+						print("✅ Вызываем callback категории Info...")
+						local rightPanel = window:FindFirstChild("RightPanel")
+						if rightPanel then
+							-- Очищаем правую панель
+							for _, panelChild in pairs(rightPanel:GetChildren()) do
+								if panelChild:IsA("Frame") or panelChild:IsA("TextLabel") or panelChild:IsA("TextButton") or panelChild:IsA("TextBox") then
+									panelChild:Destroy()
+								end
+							end
+							-- Загружаем содержимое Info (передаем rightPanel как параметр)
+							infoCategoryCallback(rightPanel)
+						end
+					end
+					break
+				end
+			end
+		end
+	end
+end
+
+print("✅ Меню автоматически открыто в категории Info!")
 
 -- Основной цикл для применения настроек
 RunService.RenderStepped:Connect(function()
