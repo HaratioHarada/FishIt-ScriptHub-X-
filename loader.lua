@@ -8,6 +8,8 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local TweenService = game:GetService("TweenService")
+local camera = workspace.CurrentCamera
+local mouse = Players.LocalPlayer:GetMouse()
 
 
 
@@ -1185,75 +1187,6 @@ local function createMainGUI()
 
 	tween:Play()
 
-	-- Создаем кнопку-иконку для быстрого доступа
-	local iconButton = Instance.new("ImageButton")
-	iconButton.Name = "MenuIcon"
-	iconButton.Size = UDim2.new(0, 50, 0, 50)
-	iconButton.Position = UDim2.new(0, 10, 0.5, -25)
-	iconButton.AnchorPoint = Vector2.new(0, 0.5)
-	iconButton.BackgroundColor3 = Color3.fromRGB(17, 17, 30)
-	iconButton.BackgroundTransparency = 0.2
-	iconButton.BorderSizePixel = 0
-	iconButton.Parent = screenGui
-
-	-- UICorner для круглой кнопки
-	local iconCorner = Instance.new("UICorner")
-	iconCorner.CornerRadius = UDim.new(0, 25)
-	iconCorner.Parent = iconButton
-
-	-- Создаем текст с иконкой рыбы и удочки
-	local iconLabel = Instance.new("TextLabel")
-	iconLabel.Name = "IconLabel"
-	iconLabel.Size = UDim2.new(1, 0, 1, 0)
-	iconLabel.BackgroundTransparency = 1
-	iconLabel.Text = "🎣"
-	iconLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	iconLabel.TextSize = 30
-	iconLabel.Font = Enum.Font.GothamBold
-	iconLabel.TextXAlignment = Enum.TextXAlignment.Center
-	iconLabel.TextYAlignment = Enum.TextYAlignment.Center
-	iconLabel.Parent = iconButton
-
-	-- Эффект при наведении
-	iconButton.MouseEnter:Connect(function()
-		iconButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-		iconButton.BackgroundTransparency = 0
-		-- Анимация увеличения
-		local tween = TweenService:Create(iconButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-			Size = UDim2.new(0, 55, 0, 55)
-		})
-		tween:Play()
-	end)
-
-	iconButton.MouseLeave:Connect(function()
-		iconButton.BackgroundColor3 = Color3.fromRGB(17, 17, 30)
-		iconButton.BackgroundTransparency = 0.2
-		-- Анимация уменьшения
-		local tween = TweenService:Create(iconButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-			Size = UDim2.new(0, 50, 0, 50)
-		})
-		tween:Play()
-	end)
-
-	-- Обработка клика на иконку
-	iconButton.MouseButton1Click:Connect(function()
-		-- Анимация нажатия
-		local clickTween = TweenService:Create(iconButton, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-			Size = UDim2.new(0, 45, 0, 45)
-		})
-		clickTween:Play()
-
-		-- Возвращаем размер после анимации
-		task.wait(0.1)
-		local restoreTween = TweenService:Create(iconButton, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-			Size = UDim2.new(0, 50, 0, 50)
-		})
-		restoreTween:Play()
-
-		-- Переключаем меню
-		toggleGUI()
-	end)
-
 	return screenGui
 end
 
@@ -1278,11 +1211,14 @@ local function createMenuIcon(toggleGUIFunc)
 	iconButton.Name = "MenuIcon"
 	iconButton.Size = UDim2.new(0, 50, 0, 50)
 	iconButton.Position = UDim2.new(0, 10, 0.5, -25)
-	iconButton.AnchorPoint = Vector2.new(0, 0.5)
+	iconButton.AnchorPoint = Vector2.new(0, 0)
 	iconButton.BackgroundColor3 = Color3.fromRGB(17, 17, 30)
 	iconButton.BackgroundTransparency = 0.2
 	iconButton.BorderSizePixel = 0
 	iconButton.Parent = iconGui
+
+	-- Сохраняем начальную позицию для корректного перетаскивания
+	local initialPosition = iconButton.Position
 
 	-- UICorner для круглой кнопки
 	local iconCorner = Instance.new("UICorner")
@@ -1301,6 +1237,64 @@ local function createMenuIcon(toggleGUIFunc)
 	iconLabel.TextXAlignment = Enum.TextXAlignment.Center
 	iconLabel.TextYAlignment = Enum.TextYAlignment.Center
 	iconLabel.Parent = iconButton
+
+	-- Переменные для перетаскивания
+	local isDragging = false
+	local dragStartPos = Vector2.new(0, 0)
+	local iconStartPos = Vector2.new(0, 0)
+	local isClick = true -- Для отличия клика от перетаскивания
+
+	-- Функция для начала перетаскивания
+	local function startDrag()
+		isDragging = true
+		isClick = true -- Сначала считаем это кликом
+		-- Используем GetMouseLocation для точных координат в пикселях
+		dragStartPos = UserInputService:GetMouseLocation()
+		-- Получаем текущую позицию иконки в пикселях (конвертируем из Scale+Offset)
+		local viewportSize = camera.ViewportSize
+		iconStartPos = Vector2.new(
+			iconButton.Position.X.Scale * viewportSize.X + iconButton.Position.X.Offset,
+			iconButton.Position.Y.Scale * viewportSize.Y + iconButton.Position.Y.Offset
+		)
+	end
+
+	-- Функция для обновления позиции при перетаскивании
+	local function updateDrag()
+		if isDragging then
+			-- Получаем текущую позицию мыши в пикселях
+			local mousePos = UserInputService:GetMouseLocation()
+			local delta = mousePos - dragStartPos
+
+			-- Если переместили более чем на 5 пикселей, считаем это перетаскиванием, а не кликом
+			if delta.Magnitude > 5 then
+				isClick = false
+			end
+
+			local newPos = iconStartPos + delta
+
+			-- Ограничиваем позицию в пределах экрана
+			local viewportSize = camera.ViewportSize
+			local iconSize = iconButton.AbsoluteSize
+
+			newPos = Vector2.new(
+				math.clamp(newPos.X, 0, viewportSize.X - iconSize.X),
+				math.clamp(newPos.Y, 0, viewportSize.Y - iconSize.Y)
+			)
+
+			iconButton.Position = UDim2.new(0, newPos.X, 0, newPos.Y)
+		end
+	end
+
+	-- Функция для завершения перетаскивания
+	local function endDrag()
+		isDragging = false
+	end
+
+	-- Обработчики событий для перетаскивания
+	iconButton.MouseButton1Down:Connect(startDrag)
+	iconButton.MouseButton1Up:Connect(endDrag)
+	mouse.Button1Up:Connect(endDrag)
+	mouse.Move:Connect(updateDrag)
 
 	-- Эффект при наведении
 	iconButton.MouseEnter:Connect(function()
@@ -1325,26 +1319,29 @@ local function createMenuIcon(toggleGUIFunc)
 
 	-- Обработка клика на иконку
 	iconButton.MouseButton1Click:Connect(function()
-		print("🖱️ Клик по иконке меню!")
-		-- Анимация нажатия
-		local clickTween = TweenService:Create(iconButton, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-			Size = UDim2.new(0, 45, 0, 45)
-		})
-		clickTween:Play()
+		-- Открываем меню только если это был клик, а не перетаскивание
+		if isClick then
+			print("🖱️ Клик по иконке меню!")
+			-- Анимация нажатия
+			local clickTween = TweenService:Create(iconButton, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Size = UDim2.new(0, 45, 0, 45)
+			})
+			clickTween:Play()
 
-		-- Возвращаем размер после анимации
-		task.wait(0.1)
-		local restoreTween = TweenService:Create(iconButton, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-			Size = UDim2.new(0, 50, 0, 50)
-		})
-		restoreTween:Play()
+			-- Возвращаем размер после анимации
+			task.wait(0.1)
+			local restoreTween = TweenService:Create(iconButton, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Size = UDim2.new(0, 50, 0, 50)
+			})
+			restoreTween:Play()
 
-		-- Переключаем меню (используем переданную функцию)
-		if toggleGUIFunc then
-			print("✅ Вызываем toggleGUI()...")
-			toggleGUIFunc()
-		else
-			print("❌ Функция toggleGUI не передана!")
+			-- Переключаем меню (используем переданную функцию)
+			if toggleGUIFunc then
+				print("✅ Вызываем toggleGUI()...")
+				toggleGUIFunc()
+			else
+				print("❌ Функция toggleGUI не передана!")
+			end
 		end
 	end)
 
