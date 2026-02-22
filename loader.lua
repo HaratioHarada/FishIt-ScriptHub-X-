@@ -350,6 +350,68 @@ local function createMainGUI()
 	title.Font = Enum.Font.GothamBold
 	title.Parent = header
 
+	-- Перетаскивание меню за заголовок
+	local isDraggingMenu = false
+	local dragStartPosMenu = Vector2.new(0, 0)
+	local menuStartPos = Vector2.new(0, 0)
+	local isClickMenu = true
+
+	local function startDragMenu()
+		isDraggingMenu = true
+		isClickMenu = true
+		dragStartPosMenu = UserInputService:GetMouseLocation()
+		local viewportSize = camera.ViewportSize
+		menuStartPos = Vector2.new(
+			window.Position.X.Scale * viewportSize.X + window.Position.X.Offset,
+			window.Position.Y.Scale * viewportSize.Y + window.Position.Y.Offset
+		)
+	end
+
+	local function updateDragMenu()
+		if isDraggingMenu then
+			local mousePos = UserInputService:GetMouseLocation()
+			local delta = mousePos - dragStartPosMenu
+
+			if delta.Magnitude > 5 then
+				isClickMenu = false
+			end
+
+			local newPos = menuStartPos + delta
+			local viewportSize = camera.ViewportSize
+			local windowSize = window.AbsoluteSize
+
+			newPos = Vector2.new(
+				math.clamp(newPos.X, 0, viewportSize.X - windowSize.X),
+				math.clamp(newPos.Y, 0, viewportSize.Y - windowSize.Y)
+			)
+
+			window.Position = UDim2.new(0, newPos.X, 0, newPos.Y)
+			window.AnchorPoint = Vector2.new(0, 0)
+		end
+	end
+
+	local function endDragMenu()
+		isDraggingMenu = false
+	end
+
+	header.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			startDragMenu()
+		end
+	end)
+
+	header.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			endDragMenu()
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement then
+			updateDragMenu()
+		end
+	end)
+
 	-- Создаем кнопку сворачивания
 	local minimizeBtn = Instance.new("TextButton")
 	minimizeBtn.Name = "MinimizeBtn"
