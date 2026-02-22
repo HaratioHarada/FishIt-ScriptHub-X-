@@ -112,7 +112,7 @@ local function createToggle(parent, name, yPos, callback)
 	local nameLabel = Instance.new("TextLabel")
 	nameLabel.Name = "NameLabel"
 	nameLabel.Size = UDim2.new(0, 300, 1, 0)
-	nameLabel.Position = UDim2.new(0, 0, 0, 0)
+	nameLabel.Position = UDim2.new(0, 2, 0, 0)
 	nameLabel.BackgroundTransparency = 1
 	nameLabel.Text = name
 	nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -221,7 +221,7 @@ local function createSlider(parent, name, yPos, minVal, maxVal, defaultVal, call
 	local nameLabel = Instance.new("TextLabel")
 	nameLabel.Name = "NameLabel"
 	nameLabel.Size = UDim2.new(1, 0, 0, 20)
-	nameLabel.Position = UDim2.new(0, 0, 0, 0)
+	nameLabel.Position = UDim2.new(0, 2, 0, 0)
 	nameLabel.BackgroundTransparency = 1
 	nameLabel.Text = name .. ": " .. tostring(currentValue)
 	nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -313,7 +313,7 @@ local function createMainGUI()
 	window.Size = UDim2.new(0, 800, 0, 500)
 	window.Position = UDim2.new(0.5, -750, 0.5, 0)
 	window.AnchorPoint = Vector2.new(0.5, 0.5)
-	window.BackgroundColor3 = Color3.fromRGB(17, 17, 30)
+	window.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 	window.BackgroundTransparency = 0.07
 	window.BorderSizePixel = 0
 	window.Parent = screenGui
@@ -328,7 +328,7 @@ local function createMainGUI()
 	header.Name = "Header"
 	header.Size = UDim2.new(1, 0, 0, 50)
 	header.Position = UDim2.new(0, 0, 0, 0)
-	header.BackgroundColor3 = Color3.fromRGB(17, 17, 30)
+	header.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 	header.BackgroundTransparency = 0.07
 	header.BorderSizePixel = 0
 	header.Parent = window
@@ -649,8 +649,7 @@ local function createMainGUI()
 	leftPanel.Name = "LeftPanel"
 	leftPanel.Size = UDim2.new(0, 220, 1, -50)
 	leftPanel.Position = UDim2.new(0, 10, 0, 50)
-	leftPanel.BackgroundColor3 = Color3.fromRGB(17, 17, 30)
-	leftPanel.BackgroundTransparency = 0.07
+	leftPanel.BackgroundTransparency = 1
 	leftPanel.BorderSizePixel = 0
 	leftPanel.ScrollBarThickness = 6
 	leftPanel.ScrollBarImageColor3 = Color3.fromRGB(68, 68, 68)
@@ -667,7 +666,8 @@ local function createMainGUI()
 	rightPanel.Name = "RightPanel"
 	rightPanel.Size = UDim2.new(1, -240, 1, -50)
 	rightPanel.Position = UDim2.new(0, 240, 0, 50)
-	rightPanel.BackgroundTransparency = 1
+	rightPanel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	rightPanel.BackgroundTransparency = 0.8
 	rightPanel.BorderSizePixel = 0
 	rightPanel.ScrollBarThickness = 6
 	rightPanel.ScrollBarImageColor3 = Color3.fromRGB(68, 68, 68)
@@ -698,7 +698,7 @@ local function createMainGUI()
 		btn.Name = name .. "Btn"
 		btn.Size = UDim2.new(1, -20, 0, 45)
 		btn.Position = UDim2.new(0, 10, 0, 0)
-		btn.BackgroundColor3 = Color3.fromRGB(51, 51, 51)
+		btn.BackgroundTransparency = 0.9
 		btn.BorderSizePixel = 0
 		btn.Text = icon .. " " .. name
 		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -722,12 +722,14 @@ local function createMainGUI()
 			-- Сбрасываем цвет всех кнопок
 			for _, child in pairs(leftPanel:GetChildren()) do
 				if child:IsA("TextButton") then
-					child.BackgroundColor3 = Color3.fromRGB(51, 51, 51)
+					child.BackgroundTransparency = 0.9
+					child.TextColor3 = Color3.fromRGB(255, 255, 255)
 				end
 			end
 
 			-- Подсвечиваем активную кнопку
-			btn.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+			btn.BackgroundTransparency = 0.7
+			btn.TextColor3 = Color3.fromRGB(0, 0, 0)
 
 			-- Очищаем правую панель
 			for _, child in pairs(rightPanel:GetChildren()) do
@@ -752,7 +754,7 @@ local function createMainGUI()
 		local titleLabel = Instance.new("TextLabel")
 		titleLabel.Name = "TitleLabel"
 		titleLabel.Size = UDim2.new(1, -20, 0, 30)
-		titleLabel.Position = UDim2.new(0, 10, 0, 10)
+		titleLabel.Position = UDim2.new(0, 25, 0, 10)
 		titleLabel.BackgroundTransparency = 1
 		titleLabel.Text = title
 		titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -778,7 +780,7 @@ local function createMainGUI()
 		local container = Instance.new("Frame")
 		container.Name = "Container"
 		container.Size = UDim2.new(1, -20, 1, -60)
-		container.Position = UDim2.new(0, 10, 0, 60)
+		container.Position = UDim2.new(0, 25, 0, 60)
 		container.BackgroundTransparency = 1
 		container.Parent = panel
 
@@ -1679,11 +1681,13 @@ if mainGui then
 					-- Сбрасываем цвет всех кнопок
 					for _, btn in pairs(leftPanel:GetChildren()) do
 						if btn:IsA("TextButton") then
-							btn.BackgroundColor3 = Color3.fromRGB(51, 51, 51)
+							btn.BackgroundTransparency = 0.9
+							btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 						end
 					end
 					-- Подсвечиваем кнопку Info
-					child.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+					child.BackgroundTransparency = 0.7
+					child.TextColor3 = Color3.fromRGB(0, 0, 0)
 					-- Вызываем callback для загрузки содержимого категории Info
 					if infoCategoryCallback then
 						print("✅ Вызываем callback категории Info...")
