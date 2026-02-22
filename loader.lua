@@ -360,11 +360,8 @@ local function createMainGUI()
 		isDraggingMenu = true
 		isClickMenu = true
 		dragStartPosMenu = UserInputService:GetMouseLocation()
-		local viewportSize = camera.ViewportSize
-		menuStartPos = Vector2.new(
-			window.Position.X.Scale * viewportSize.X + window.Position.X.Offset,
-			window.Position.Y.Scale * viewportSize.Y + window.Position.Y.Offset
-		)
+		-- Получаем текущую позицию меню в пикселях (используем AbsolutePosition)
+		menuStartPos = window.AbsolutePosition
 	end
 
 	local function updateDragMenu()
@@ -1502,12 +1499,8 @@ local function createMenuIcon(toggleGUIFunc)
 		isClick = true -- Сначала считаем это кликом
 		-- Используем GetMouseLocation для точных координат в пикселях
 		dragStartPos = UserInputService:GetMouseLocation()
-		-- Получаем текущую позицию иконки в пикселях (конвертируем из Scale+Offset)
-		local viewportSize = camera.ViewportSize
-		iconStartPos = Vector2.new(
-			iconButton.Position.X.Scale * viewportSize.X + iconButton.Position.X.Offset,
-			iconButton.Position.Y.Scale * viewportSize.Y + iconButton.Position.Y.Offset
-		)
+		-- Получаем текущую позицию иконки в пикселях (используем AbsolutePosition)
+		iconStartPos = iconButton.AbsolutePosition
 	end
 
 	-- Функция для обновления позиции при перетаскивании
