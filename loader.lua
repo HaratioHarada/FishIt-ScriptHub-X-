@@ -851,7 +851,7 @@ local function createMainGUI()
 			end
 
 			-- Создаем заголовок для локаций
-			createRightPanelTitle("🏝️ Выберите локацию:", rightPanel)
+			createRightPanelTitle("🏝️ Choose a location:", rightPanel)
 			local locationContainer = createRightPanelContainer(rightPanel)
 
 			-- Список локаций в правильном порядке (все 17 локаций)
@@ -930,7 +930,7 @@ local function createMainGUI()
 			end
 
 			-- Создаем заголовок для игроков
-			createRightPanelTitle("👤 Выберите игрока:", rightPanel)
+			createRightPanelTitle("👤 Choose a player:", rightPanel)
 			local playerContainer = createRightPanelContainer(rightPanel)
 
 			-- Функция телепортации к игроку
