@@ -827,13 +827,25 @@ local function createMainGUI()
 		-- AutoSell
 		createToggle(container, "💰 AutoSell", 0, function(enabled)
 			guiFunctions.autoSell = enabled
+			_G.AutoSell = enabled
 			print("AutoSell:", enabled)
 			if enabled then
 				sellFish()
+			else
+				_G.AutoSell = false
+				if sellThread then task.cancel(sellThread) end
+				sellThread = nil
+				print("🛑 AutoSell остановлен!")
 			end
 		end)
 
-		rightPanel.CanvasSize = UDim2.new(0, 0, 0, 250)
+		-- Sell Delay
+		createSlider(container, "⏱️ Sell Delay", 0, 1, 120, 30, function(value)
+			_G.SellDelay = value
+			print("Sell Delay:", value)
+		end)
+
+		rightPanel.CanvasSize = UDim2.new(0, 0, 0, 300)
 	end)
 
 	-- Teleport категория
@@ -881,7 +893,6 @@ local function createMainGUI()
 			}
 
 			-- Создаем кнопки для каждой локации
-			local yPos = 0
 			for i, location in ipairs(locations) do
 				local locationBtn = Instance.new("TextButton")
 				locationBtn.Name = location.name:gsub("[^%w]", "") .. "Btn"
@@ -911,13 +922,13 @@ local function createMainGUI()
 					rootPart.CFrame = CFrame.new(location.pos)
 					print("Телепортировано в:", location.name, location.pos)
 				end)
-
-				yPos = yPos + 32
 			end
 
 			-- Устанавливаем правильный CanvasSize для всех локаций
-			rightPanel.CanvasSize = UDim2.new(0, 0, 0, yPos + 200)
-			print("Создано локаций:", #locations, "CanvasSize установлен на:", yPos + 200)
+			-- Каждая кнопка 30px + 10px padding = 40px
+			local totalHeight = #locations * 40 + 100
+			rightPanel.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+			print("Создано локаций:", #locations, "CanvasSize установлен на:", totalHeight)
 		end)
 
 		-- Teleport to Player
@@ -973,7 +984,6 @@ local function createMainGUI()
 			end
 
 			-- Создаем кнопки для каждого игрока
-			local yPos = 0
 			for i, player in ipairs(playersList) do
 				local playerBtn = Instance.new("TextButton")
 				playerBtn.Name = player.Name .. "Btn"
@@ -996,15 +1006,13 @@ local function createMainGUI()
 				playerBtn.MouseButton1Click:Connect(function()
 					teleportToPlayer(player)
 				end)
-
-				yPos = yPos + 32
 			end
 
-
-
 			-- Устанавливаем правильный CanvasSize (как в Teleport to Island)
-			rightPanel.CanvasSize = UDim2.new(0, 0, 0, yPos + 200)
-			print("Создано игроков для телепортации:", #playersList, "CanvasSize:", yPos + 200)
+			-- Каждая кнопка 30px + 10px padding = 40px
+			local totalHeight = #playersList * 40 + 100
+			rightPanel.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+			print("Создано игроков для телепортации:", #playersList, "CanvasSize:", totalHeight)
 		end)
 
 		rightPanel.CanvasSize = UDim2.new(0, 0, 0, 350)
@@ -1939,17 +1947,60 @@ local function stopAutoFish()
 	autoFishConnection = nil
 end
 
--- AutoSell функция
-local function sellFish()
-	-- Здесь должна быть логика продажи рыбы
-	-- Исключая рыбу из favoriteRarities
-	print("AutoSell: Продаем рыбу...")
-	for rarity, isFavorite in pairs(favoriteRarities) do
-		if isFavorite then
-			print("Пропускаем", rarity, "(в избранном)")
-		else
-			print("Продаем", rarity)
+-- AutoSell переменные
+local sellThread = nil
+_G.AutoSell = false
+_G.SellDelay = 30
+
+-- Функция AutoSell
+local function autosell()
+	while _G.AutoSell do
+		-- Логика продажи рыбы
+		-- Ищем инвентарь и продаем рыбу, исключая избранные редкости
+		
+		-- Поиск GUI инвентаря (зависит от структуры игры)
+		local playerGui = Players.LocalPlayer:FindFirstChild("PlayerGui")
+		if playerGui then
+			-- Ищем GUI магазина/инвентаря
+			local merchantGui = playerGui:FindFirstChild("Merchant")
+			if merchantGui then
+				local main = merchantGui:FindFirstChild("Main")
+				if main then
+					-- Ищем кнопку продажи
+					for _, descendant in pairs(main:GetDescendants()) do
+						if (descendant:IsA("TextButton") or descendant:IsA("ImageButton")) then
+							local text = string.lower(descendant.Text or "")
+							-- Ищем кнопку "Sell" или "Продать"
+							if text:find("sell") or text:find("продать") then
+								-- Нажимаем на кнопку продажи
+								pcall(function()
+									descendant.MouseButton1Click:Fire()
+									print("✅ AutoSell: Кнопка продажи нажата")
+								end)
+								break
+							end
+						end
+					end
+				end
+			end
 		end
+		
+		-- Ждем перед следующей продажей
+		task.wait(_G.SellDelay)
+	end
+end
+
+-- Функция для запуска AutoSell
+local function sellFish()
+	if _G.AutoSell then
+		if sellThread then task.cancel(sellThread) end
+		sellThread = task.spawn(autosell)
+		print("🚀 AutoSell запущен! Задержка:", _G.SellDelay, "сек")
+	else
+		_G.AutoSell = false
+		if sellThread then task.cancel(sellThread) end
+		sellThread = nil
+		print("🛑 AutoSell остановлен!")
 	end
 end
 
