@@ -866,6 +866,7 @@ local function createMainGUI()
 				{["name"] = "Crater Island", ["pos"] = Vector3.new(986.1216430664062, 30.208383560180664, 4952.654296875)},
 				{["name"] = "Pirate Cove", ["pos"] = Vector3.new(3358.006591796875, 4.192970275878906, 3519.951171875)},
 				{["name"] = "Pirate Treasure Room", ["pos"] = Vector3.new(3302.267333984375, -299.5013122558594, 3016.651123046875)},
+				{["name"] = "Leviathan's Lair", ["pos"] = Vector3.new(3473.525146484375, -287.84320068359375, 3474.171630859375)},
 				{["name"] = "Crystal Depths", ["pos"] = Vector3.new(5686.9443359375, -891.0681762695312, 15294.7333984375)},
 				{["name"] = "Esoteric Depths", ["pos"] = Vector3.new(3193.7265625, -1302.7301025390625, 1420.59814453125)},
 				{["name"] = "Kohana", ["pos"] = Vector3.new(-643.0057373046875, 16.030197143554688, 615.0732421875)},
