@@ -69,12 +69,12 @@ local weatherPrices = {
 }
 -- Product IDs для погоды (замените на реальные ID из игры)
 local weatherProductIds = {
-	["Wind"] = 0, -- Замените на реальный Product ID
-	["Cloudy"] = 0, -- Замените на реальный Product ID
-	["Snow"] = 0, -- Замените на реальный Product ID
-	["Storm"] = 0, -- Замените на реальный Product ID
-	["Shining"] = 0, -- Замените на реальный Product ID
-	["SharkHunt"] = 0 -- Замените на реальный Product ID
+	["Wind"] = 7058120, -- Замените на реальный Product ID
+	["Cloudy"] = 7058120, -- Замените на реальный Product ID
+	["Snow"] = 7058120, -- Замените на реальный Product ID
+	["Storm"] = 7058120, -- Замените на реальный Product ID
+	["Shining"] = 7058120, -- Замените на реальный Product ID
+	["SharkHunt"] = 7058120 -- Замените на реальный Product ID
 }
 local weatherConnections = {}
 
